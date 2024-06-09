@@ -30,14 +30,16 @@ def model_to_df(model, first_hour, last_hour):
     hours = range(model.T[first_hour + 1], model.T[last_hour + 1] + 1)
     Ein = [value(model.Ein[i]) for i in hours]
     Eout = [value(model.Eout[i]) for i in hours]
-    lbmp = [model.P.extract_values()[None][i] for i in hours]
+    price = [model.P.extract_values()[None][i] for i in hours]
+    output = [model.O.extract_values()[None][i] for i in hours]
     charge_state = [value(model.S[i]) for i in hours]
 
     df_dict = dict(
         hour=hours,
         Ein=Ein,
         Eout=Eout,
-        lbmp=lbmp,
+        price=price,
+        output=output,
         charge_state=charge_state
     )
 
@@ -76,11 +78,12 @@ def optimize_year(df, first_model_hour=0, last_model_hour=8759):
 
     # Define model parameters
     model.T = Set(doc='hour of year', initialize=df.hour.tolist(), ordered=True)
-    model.Rmax = Param(initialize=100,
-                       doc='Max rate of power flow (kW) in or out')
+    model.Rmax = Param(initialize=50,
+                       doc='Max rate of power flow (MW) in or out')
     model.Smax = Param(initialize=200, doc='Max storage (kWh)')
     model.Dmax = Param(initialize=200, doc='Max discharge in 24 hour period')
-    model.P = Param(initialize=df.lbmp.tolist(), doc='LBMP for each hour')
+    model.P = Param(initialize=df.price.tolist(), doc='Price for each hour')
+    model.O = Param(initialize=df.power.tolist(), doc='Output of the plant (MW)')
     eta = 0.85 # Round trip storage efficiency
 
     # Charge, discharge, and state of charge
@@ -111,7 +114,7 @@ def optimize_year(df, first_model_hour=0, last_model_hour=8759):
 
     def charge_constraint(model, t):
         "Maximum charge within a single hour"
-        return model.Ein[t] <= model.Rmax
+        return (model.Ein[t] <= model.Rmax, model.Ein[t] <= model.O[t])
 
     model.charge = Constraint(model.T, rule=charge_constraint)
 
@@ -137,8 +140,8 @@ def optimize_year(df, first_model_hour=0, last_model_hour=8759):
     model.limit_out = Constraint(model.T, rule=discharge_limit)
 
     # Define the battery income, expenses, and profit
-    income = sum(df.loc[t, 'lbmp'] * model.Eout[t] for t in model.T)
-    expenses = sum(df.loc[t, 'lbmp'] * model.Ein[t] for t in model.T)
+    income = sum(df.loc[t, 'price'] * model.Eout[t] for t in model.T)
+    expenses = sum(df.loc[t, 'price'] * model.Ein[t] for t in model.T)
     profit = income - expenses
     model.objective = Objective(expr=profit, sense=maximize)
 
