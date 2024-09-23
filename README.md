@@ -41,7 +41,7 @@ Using python, code a model that meets the Overall System Requirements and uses t
   - Max power capacity (both charge and discharge) = 50 MW
   - Discharge energy capacity = 200 MWh
   - AC-AC round trip efficiency = 85%
-  - Maximum daily discharged throughput (kWh) = 200 MWh
+  - Maximum daily discharged throughput (MWh) = 200 MWh
 - Market prices inputs
   - 2020 and 2023 Hourly prices
   - Taken from Omie/ENTSO-E website
