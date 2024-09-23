@@ -6,32 +6,32 @@ This is a project modeling battery storage and dispatch behavior in the Spanish 
 Functions to read data and run the optimization are included in the `src` folder. The optimization and exploration of results are included in the `Dispatch optimization` notebook. The `Price exploration` notebook includes a few figures exploring patterns in hourly electricity price values over the course of 2020 and 2023.
 
 ## Project specifications
-The goal here is to analyze the revenue generation from a battery storage system that is performing energy arbitrage by participating in the Spanish day ahead energy market. What are the market dynamics? I'm not trying to build a system that will actually optimize battery storage behavior going into the future, just building a quick tool to see how things have worked in the past.
+The goal here is to analyze the revenue generation from a battery storage system that is performing energy arbitrage by participating in the Spanish day ahead electricity market for arbitrage. The algorithm optimizes the operation of BESS on historical electricity prices data. But the algorithm can be modified to look at a 24 hour window of current day ahead prices and output the operating schedule for the next day.
 
 ### System Requirements
-1. The system SHALL optimize the battery storage dispatch (with an optimization time horizon of at
+1. The system optimizes the battery storage dispatch (with an optimization time horizon of at
 least 1 day) for the day ahead energy market
-  - The battery storage’s State of Energy SHALL be continuous between optimization time
+  - The battery storage’s State of Energy will be continuous between optimization time
 horizon boundaries
-2. The system SHALL accept the following as inputs for the battery storage asset:
+2. The system shall accept the following as inputs for the battery storage asset:
   - Max discharge power capacity (MW)
   - Max charge power capacity (MW)
   - Discharge energy capacity (MWh)
   - AC-AC Round-trip efficiency (%)
-  - Maximum daily discharged throughput (kWh)
-3. The system SHALL accept the following as inputs for the market revenues:
+  - Maximum daily discharged throughput (MWh)
+3. The system shall accept the following as inputs for the market revenues:
   - Hourly price (euro/MWh)
-  - Zone
-4. The system SHALL output the following values about a given battery storage system, for a year’s
+  - Output of the solar PV plant as charging input
+4. The system shall output the following values about a given battery storage system, for a year’s
 worth of data, at an hourly resolution
   - Power output (MW)
   - State of Energy (MWh)
-5. The system SHALL output the following summary values about a given storage system:
+5. The system shall output the following summary values about a given storage system:
   - Total annual revenue generation (euro)
   - Total annual charging cost (euro)
   - Total annual discharged throughput (MWh)
-6. The system SHALL output the following plots
-  - A plot that includes both hourly battery dispatch and hourly LBMP for the most
+6. The system shall output the following plots
+  - A plot that includes both hourly battery dispatch and hourly price for the most
 profitable week
   - A plot that shows the total profit for each month
 
@@ -44,7 +44,7 @@ Using python, code a model that meets the Overall System Requirements and uses t
   - Maximum daily discharged throughput (kWh) = 200 MWh
 - Market prices inputs
   - 2020 and 2023 Hourly prices
-  - Taken from Omie website
+  - Taken from Omie/ENTSO-E website
 - Assumptions
   - The battery storage system has 100% depth of discharge capabilities
   - The battery storage system does not experience any degradation during the first
